@@ -1,0 +1,43 @@
+{
+    "name": "zenfuse-sdk",
+    "version": "0.0.1",
+    "description": "Zenfuse services SDK on JavaScript",
+    "main": "src/index.js",
+    "scripts": {
+        "format": "eslint --fix .; prettier --write .",
+        "lint": "eslint ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/zenfuse/zenfuse-sdk.git"
+    },
+    "files": [
+        "src"
+    ],
+    "author": "zenfuse.io",
+    "license": "AGPL-3.0-or-later",
+    "engines": {
+        "node": ">=12",
+        "npm": ">=6"
+    },
+    "bugs": {
+        "url": "https://github.com/zenfuse/zenfuse-sdk/issues"
+    },
+    "homepage": "https://zenfuse.js",
+    "devDependencies": {
+        "eslint": "^7.32.0",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-config-standard": "^16.0.3",
+        "eslint-plugin-import": "^2.25.2",
+        "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-prettier": "^4.0.0",
+        "eslint-plugin-promise": "^5.1.1",
+        "jest": "^27.5.1"
+    },
+    "dependencies": {
+        "axios": "^0.25.0"
+    },
+    "wallaby": {
+        "maxConsoleMessagesPerTest": 100000
+    }
+}
