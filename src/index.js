@@ -152,9 +152,28 @@ function Markets() {
     };
 }
 
+function SocialService() {
+    this.url = process.env.SOCIAL_SERVICE_URL || 'http://localhost:1342';
+
+    this.getPosts = async (params) => {
+        const posts = await axios({
+            url: `${this.url}/api/posts`,
+        })
+            .then((res) => res)
+            .catch((error) => {
+                error; //?
+                console.error(error);
+            });
+        params; //?
+
+        return posts;
+    };
+}
+
 function ZenfuseApi() {
     this.backend = new DashboardBackend();
     this.markets = new Markets();
+    this.socialService = new SocialService();
 }
 
 module.exports = { ZenfuseApi };

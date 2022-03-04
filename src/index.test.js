@@ -10,6 +10,7 @@ const nock = require('nock');
 const backendGetTickers = mockData.backend.ticker.tickers.tickers;
 const backendGetUsers = mockData.backend.user.users.controllers.http.index.get.response; //?
 const marketsCmcGlobalData = mockData.markets.cmcGlobalData.controllers.http.cryptocurrencies.get.response; //?
+const socialService = mockData.socialService; //?
 
 beforeAll(async () => {
     console.error = jest.fn();
@@ -98,6 +99,21 @@ describe('Zenfuse', () => {
                 const tickerInfo = await zenfuse.markets.getTickerInfo({ id: 1 }); //?
 
                 expect(tickerInfo.price).toBeDefined();
+            });
+        });
+    });
+
+    describe('Social Service', () => {
+        describe('getPosts', () => {
+            it.only('должен возвращать массив постов', async () => {
+                const zenfuse = new ZenfuseApi();
+                mockData.socialService.posts.controllers.http.index.get.withComments.response; //?
+
+                nock(zenfuse.socialService.url).persist().get('/api/posts').reply(200, mockData);
+
+                const posts = await zenfuse.socialService.getPosts();
+
+                posts; //?
             });
         });
     });

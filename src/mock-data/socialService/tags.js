@@ -1,25 +1,27 @@
 const model = {
-  id: 3,
-  title: "bitcoin",
+    id: 3,
+    attributes: {
+        title: 'bitcoin',
+    },
 };
 
 const controllers = {
-  http: {
-    index: {
-      get: {
-        response: [model],
-      },
-      post: {
-        request: {
-          title: model.title,
+    http: {
+        index: {
+            get: {
+                response: [model],
+            },
+            post: {
+                request: {
+                    title: model.title,
+                },
+                response: model,
+            },
         },
-        response: model,
-      },
     },
-  },
 };
 
 module.exports = {
-  model,
-  controllers,
+    model,
+    controllers,
 };
