@@ -1,19 +1,19 @@
 const model = {
-  id: 3,
-  title: "bitcoin",
+  user: 2,
+  total: 34445,
+  userExchanges: {
+    43: {
+      12: 56654.32,
+      57: 2140.5,
+    },
+  },
 };
 
 const controllers = {
   http: {
-    index: {
+    totalBalances: {
       get: {
         response: [model],
-      },
-      post: {
-        request: {
-          title: model.title,
-        },
-        response: model,
       },
     },
   },
