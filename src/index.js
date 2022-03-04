@@ -14,7 +14,7 @@ function DashboardBackend() {
             .then((res) => {
                 res; //?
 
-                return res;
+                return res.data;
             })
             .catch((error) => {
                 error; //?
@@ -31,7 +31,7 @@ function DashboardBackend() {
                 .then((res) => {
                     res; //?
 
-                    return res;
+                    return res.data;
                 })
                 .catch((error) => {
                     error; //?
@@ -55,7 +55,7 @@ function DashboardBackend() {
             .then((res) => {
                 res; //?
 
-                return res;
+                return res.data;
             })
             .catch((error) => {
                 error; //?
@@ -72,7 +72,7 @@ function DashboardBackend() {
                 .then((res) => {
                     res; //?
 
-                    return res;
+                    return res.data;
                 })
                 .catch((error) => {
                     error; //?
@@ -109,7 +109,7 @@ function Markets() {
         })
             .then((res) => {
                 res; //?
-                return res;
+                return res.data;
             })
             .catch((error) => {
                 error; //?
