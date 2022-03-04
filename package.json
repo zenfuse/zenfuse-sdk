@@ -11,9 +11,6 @@
         "type": "git",
         "url": "git+https://github.com/zenfuse/zenfuse-sdk.git"
     },
-    "files": [
-        "src"
-    ],
     "author": "zenfuse.io",
     "license": "AGPL-3.0-or-later",
     "engines": {
