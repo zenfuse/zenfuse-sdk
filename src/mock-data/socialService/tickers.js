@@ -1,20 +1,21 @@
-const postTickers = require("./postTickers");
+const postTickers = require('./postTickers');
 
 const model = {
-  id: 3,
-  backendId: 546,
-  apiId: 56567,
-  postTickers: [postTickers.model.id],
+    id: 3,
+    attributes: {
+        backend_id: 546,
+        api_id: 56567,
+    },
 };
 
 const controllers = {
-  http: {
-    index: {
-      get: {
-        response: [{ model, postTickers: [postTickers.model] }],
-      },
+    http: {
+        index: {
+            get: {
+                response: [{ model, postTickers: [postTickers.model] }],
+            },
+        },
     },
-  },
 };
 
 module.exports = { model, controllers };

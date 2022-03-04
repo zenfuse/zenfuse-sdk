@@ -13,9 +13,9 @@ const model = {
         text: "Next week we'll start a cool new concept.\n\nIt's a newsletter. \n\nThree posts a week. First week is free.",
         tags: [tags.model],
         media: [mediaLibrary.model.image],
-        user: usersPermission.model.user.id,
-        isActive: true,
-        postTickers: [postTickers.model.id],
+        user: usersPermission.model.user,
+        is_active: true,
+        postTickers: [postTickers.model],
     },
 };
 
