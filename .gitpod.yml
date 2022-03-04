@@ -2,6 +2,7 @@ tasks:
   - name: Install dependencies
     command: yarn install
 
+
 vscode:
   extensions:
     - ms-azuretools.vscode-docker
