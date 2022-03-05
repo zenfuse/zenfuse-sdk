@@ -104,8 +104,21 @@ describe('Zenfuse', () => {
     });
 
     describe('Social Service', () => {
+        describe('getProfiles', () => {
+            it.only('должен возвращать массив пользователей', async () => {
+                const zenfuse = new ZenfuseApi();
+                mockData.socialService.profiles.controllers.http.index.get.response; //?
+
+                nock(zenfuse.socialService.url)
+                    .persist()
+                    .get('/api/profiles')
+                    .reply(200, mockData.socialService.profiles.controllers.http.index.get.response);
+
+                const profiles = await zenfuse.socialService.getProfiles(); //?
+            });
+        });
         describe('getPosts', () => {
-            it.only('должен возвращать массив постов', async () => {
+            it('должен возвращать массив постов', async () => {
                 const zenfuse = new ZenfuseApi();
                 mockData.socialService.posts.controllers.http.index.get.withComments.response; //?
 

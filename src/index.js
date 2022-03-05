@@ -155,6 +155,19 @@ function Markets() {
 function SocialService() {
     this.url = process.env.SOCIAL_SERVICE_URL || 'http://localhost:1342';
 
+    this.getProfiles = async (params) => {
+        const profiles = await axios({
+            url: `${this.url}/api/profiles`,
+        })
+            .then((res) => res.data)
+            .catch((error) => {
+                error; //?
+                console.error(error);
+            });
+
+        return profiles;
+    };
+
     this.getPosts = async (params) => {
         const posts = await axios({
             url: `${this.url}/api/posts`,
