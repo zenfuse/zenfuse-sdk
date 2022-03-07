@@ -5,32 +5,50 @@ const qs = require('qs');
 const maxRequestEntitesAmount = 100;
 const servicesApiKey = process.env.SERVICES_API_KEY;
 
-class DashboardBackend {
-    constructor() {
-        this.url = process.env.DASHBOARD_BACKEND_URL || 'http://localhost:1337'; //?
-    }
+class StrapiAdapter {
+    constructor() {}
 
-    async getTickers() {
-        const tickers = [];
-        const tickersCount = await axios({
-            url: `${this.url}/tickers/count`,
-        })
-            .then((res) => {
-                res; //?
-
-                return res.data;
+    /**
+     * Функция для порционного запроса определенного ендпоинта в
+     * зависимости от количества существующих экземпляров
+     *
+     * @param {string} countUrl - URL на метод count модели (https://api.zenfuse/tickers/count)
+     * @param {string} reuqestUrl - URL на метод запроса данных с query (https://api.zenfuse/tickers)
+     * @returns {array}
+     */
+    async batchRequests({ countUrl, reuqestUrl, strapiVersion = 3 }) {
+        const modelData = [];
+        let modelCount;
+        if (countUrl) {
+            modelCount = await axios({
+                url: countUrl,
             })
-            .catch((error) => {
-                error; //?
-                error.message; //?
-                console.error(error);
-            });
+                .then((res) => {
+                    res; //?
+
+                    return res.data;
+                })
+                .catch((error) => {
+                    error; //?
+                    error.message; //?
+                    console.error(error);
+                });
+        }
+        modelCount; //?
 
         let start = 0;
-        const requests = Math.ceil(tickersCount / maxRequestEntitesAmount); //?
+        const requests = Math.ceil(modelCount / maxRequestEntitesAmount); //?
+
         for (let i = 0; i < requests; i++) {
-            const reqTickers = await axios({
-                url: `${this.url}/tickers?_start=${start}&_limit=${maxRequestEntitesAmount}`,
+            const requestQuery =
+                strapiVersion === 3
+                    ? `${
+                          reuqestUrl.indexOf('?') > -1 ? '&' : '?'
+                      }_start=${start}&_limit=${maxRequestEntitesAmount}`
+                    : '';
+
+            const requestData = await axios({
+                url: `${reuqestUrl}${requestQuery}`,
             })
                 .then((res) => {
                     res; //?
@@ -43,51 +61,34 @@ class DashboardBackend {
                     console.error(error);
                 });
 
-            reqTickers.forEach((t) => tickers.push(t));
+            requestData.forEach((t) => modelData.push(t));
 
             start += maxRequestEntitesAmount;
         }
+
+        return modelData;
+    }
+}
+class DashboardBackend extends StrapiAdapter {
+    constructor() {
+        super();
+        this.url = process.env.DASHBOARD_BACKEND_URL || 'http://localhost:1337'; //?
+    }
+
+    async getTickers() {
+        const tickers = await this.batchRequests({
+            countUrl: `${this.url}/tickers/count`,
+            reuqestUrl: `${this.url}/tickers`,
+        }); //?
 
         return tickers;
     }
 
     async getUsers() {
-        const users = [];
-        const usersCount = await axios({
-            url: `${this.url}/users/count?services_api_key=${servicesApiKey}`,
-        })
-            .then((res) => {
-                res; //?
-
-                return res.data;
-            })
-            .catch((error) => {
-                error; //?
-                error.message; //?
-                console.error(error);
-            });
-
-        let start = 0;
-        const requests = Math.ceil(usersCount / maxRequestEntitesAmount); //?
-        for (let i = 0; i < requests; i++) {
-            const reqUsers = await axios({
-                url: `${this.url}/users?services_api_key=${servicesApiKey}&_start=${start}&_limit=${maxRequestEntitesAmount}`,
-            })
-                .then((res) => {
-                    res; //?
-
-                    return res.data;
-                })
-                .catch((error) => {
-                    error; //?
-                    error.message; //?
-                    console.error(error);
-                });
-
-            reqUsers.forEach((t) => users.push(t));
-
-            start += maxRequestEntitesAmount;
-        }
+        const users = await this.batchRequests({
+            countUrl: `${this.url}/users/count?services_api_key=${servicesApiKey}`,
+            reuqestUrl: `${this.url}/users?services_api_key=${servicesApiKey}`,
+        }); //?
 
         return users;
     }

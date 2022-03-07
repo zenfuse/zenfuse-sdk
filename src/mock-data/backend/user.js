@@ -1,25 +1,24 @@
 const model = {
-  user: 2,
-  total: 34445,
-  userExchanges: {
-    43: {
-      12: 56654.32,
-      57: 2140.5,
-    },
-  },
+    id: 28,
+    username: 'betatester',
+    email: 'betatester@zenfuse.io',
+    user_profile: {},
+    is_beta_tester: true,
 };
 
 const controllers = {
-  http: {
-    totalBalances: {
-      get: {
-        response: [model],
-      },
+    http: {
+        index: {
+            get: {
+                request: {
+                    query: {
+                        balances_secret_key: 'SECRET_KEY',
+                    },
+                },
+                response: [{ ...model }],
+            },
+        },
     },
-  },
 };
 
-module.exports = {
-  model,
-  controllers,
-};
+module.exports = { model, controllers };

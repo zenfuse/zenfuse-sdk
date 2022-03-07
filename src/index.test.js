@@ -9,7 +9,7 @@ const nock = require('nock');
 const tdd = require('./tdd');
 
 const backendGetTickers = mockData.backend.ticker.tickers.tickers;
-const backendGetUsers = mockData.backend.user.users.controllers.http.index.get.response; //?
+const backendGetUsers = mockData.backend.user.controllers.http.index.get.response; //?
 const marketsCmcGlobalData = mockData.markets.cmcGlobalData.controllers.http.cryptocurrencies.get.response; //?
 const socialService = mockData.socialService; //?
 
@@ -77,10 +77,13 @@ describe('Zenfuse', () => {
                     })
                     .reply(200, backendGetUsers);
 
-                const tickers = await zenfuse.backend.getUsers(); //?
+                zenfuse; //?
+
+                const users = await zenfuse.backend.getUsers(); //?
+
                 apiCalls; //?
-                expect(Array.isArray(tickers)).toEqual(true);
-                expect(tickers.length >= backendGetUsers.length * 10).toEqual(true);
+                expect(Array.isArray(users)).toEqual(true);
+                expect(users.length >= backendGetUsers.length * 10).toEqual(true);
 
                 expect(apiCalls).toEqual(11);
             });
@@ -106,7 +109,7 @@ describe('Zenfuse', () => {
 
     describe('Social Service', () => {
         describe('getProfiles', () => {
-            it.only('должен возвращать массив пользователей', async () => {
+            it('должен возвращать массив пользователей', async () => {
                 mockData.socialService.profiles.controllers.http.index.get.response; //?
 
                 const mockUserModel = mockData.socialService.profiles.model; //?
