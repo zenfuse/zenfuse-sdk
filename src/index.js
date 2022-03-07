@@ -1,14 +1,16 @@
 const axios = require('axios');
-const { prepareEntityForGet } = require('./utils/adapters');
+const { prepareEntityForGet, prepareQuery } = require('./utils/adapters');
 const qs = require('qs');
 
 const maxRequestEntitesAmount = 100;
 const servicesApiKey = process.env.SERVICES_API_KEY;
 
-function DashboardBackend() {
-    this.url = process.env.DASHBOARD_BACKEND_URL || 'http://localhost:1337'; //?
+class DashboardBackend {
+    constructor() {
+        this.url = process.env.DASHBOARD_BACKEND_URL || 'http://localhost:1337'; //?
+    }
 
-    this.getTickers = async () => {
+    async getTickers() {
         const tickers = [];
         const tickersCount = await axios({
             url: `${this.url}/tickers/count`,
@@ -47,9 +49,9 @@ function DashboardBackend() {
         }
 
         return tickers;
-    };
+    }
 
-    this.getUsers = async () => {
+    async getUsers() {
         const users = [];
         const usersCount = await axios({
             url: `${this.url}/users/count?services_api_key=${servicesApiKey}`,
@@ -88,15 +90,17 @@ function DashboardBackend() {
         }
 
         return users;
-    };
+    }
 }
 
-function Markets() {
-    this.url = process.env.MARKETS_SERVICE_URL || 'http://localhost:1339'; //?
-    this.cacheRestoreDelta = 5 * 60 * 1000;
-    this.cache = {};
+class Markets {
+    constructor() {
+        this.url = process.env.MARKETS_SERVICE_URL || 'http://localhost:1339'; //?
+        this.cacheRestoreDelta = 5 * 60 * 1000;
+        this.cache = {};
+    }
 
-    this.getGlobalData = async () => {
+    async getGlobalData() {
         const timestamp = new Date().getTime();
 
         if (
@@ -122,9 +126,9 @@ function Markets() {
         this.cache.getGlobalData = { timestamp, data: { ...data } };
 
         return data;
-    };
+    }
 
-    this.getTickerInfo = async ({ id, quote = 'usd' }) => {
+    async getTickerInfo({ id, quote = 'usd' }) {
         const globalData = await this.getGlobalData(); //?
 
         if (!globalData) {
@@ -151,13 +155,15 @@ function Markets() {
             }); //?
 
         return tickerInfo?.length ? tickerInfo[0] : undefined;
-    };
+    }
 }
 
-function SocialService() {
-    this.url = process.env.SOCIAL_SERVICE_URL || 'http://localhost:1342';
+class SocialService {
+    constructor() {
+        this.url = process.env.SOCIAL_SERVICE_URL || 'http://localhost:1342'; //?
+    }
 
-    this.getProfiles = async (params) => {
+    async getProfiles(params) {
         let query;
         if (params?.query) {
             query = qs.stringify(
@@ -183,9 +189,9 @@ function SocialService() {
         const preparedUsers = profiles.data.map((u) => prepareEntityForGet(u)); //?
 
         return { data: preparedUsers, meta: {} };
-    };
+    }
 
-    this.getPosts = async (params) => {
+    async getPosts(params) {
         const posts = await axios({
             url: `${this.url}/api/posts`,
         })
@@ -197,38 +203,15 @@ function SocialService() {
         params; //?
 
         return posts;
-    };
+    }
 }
 
-function ZenfuseApi() {
-    this.backend = new DashboardBackend();
-    this.markets = new Markets();
-    this.socialService = new SocialService();
+class ZenfuseApi {
+    constructor() {
+        this.backend = new DashboardBackend();
+        this.markets = new Markets();
+        this.socialService = new SocialService();
+    }
 }
 
 module.exports = { ZenfuseApi };
-
-function prepareQuery(query, type = '') {
-    query; //?
-    const queryObject = {};
-
-    for (const key of Object.keys(query)) {
-        key; //?
-        if (typeof query[key] === 'object') {
-            query[key]; //?
-
-            query[key] = prepareQuery(
-                query[key],
-                key === 'populate' ? 'populate' : type === 'populate' ? 'populate' : ''
-            );
-        }
-
-        if (type === 'populate' && query[key] === true) {
-            queryObject[key] = '*'; //?
-        } else {
-            queryObject[key] = query[key];
-        }
-    }
-
-    return queryObject; //?
-}

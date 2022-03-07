@@ -36,6 +36,7 @@
     "dependencies": {
         "@bit/flake.flake-ui.src.functions.utils.string-case-utils": "^1.0.9",
         "axios": "^0.25.0",
+        "dotenv": "^16.0.0",
         "qs": "^6.10.3",
         "ramda": "^0.28.0",
         "ws": "^8.5.0"

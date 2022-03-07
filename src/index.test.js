@@ -125,7 +125,7 @@ describe('Zenfuse', () => {
                 }; //?
 
                 const zenfuse = new ZenfuseApi();
-                mockData.socialService.profiles.controllers.http.index.get.response; //?
+                mockData.socialService.profiles.controllers.http.index.get.base.response; //?
 
                 nock(zenfuse.socialService.url)
                     .persist()
@@ -136,13 +136,12 @@ describe('Zenfuse', () => {
                     })
                     .reply(200, mockData.socialService.profiles.controllers.http.index.get.base.response);
 
-                const profiles = await zenfuse.socialService.getProfiles({
-                    query: { populate: { posts: true, post_tickers: { ticker: true } } },
-                }); //?
+                const profiles = await zenfuse.socialService.getProfiles(); //?
 
                 expect(tdd.utils.assertTypes(profiles, expectation)).toEqual(true);
             });
         });
+
         describe('getPosts', () => {
             it('должен возвращать массив постов', async () => {
                 const zenfuse = new ZenfuseApi();
