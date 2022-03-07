@@ -1,136 +1,130 @@
-const WebSocket = require(`ws`);
-const fetch = require(`node-fetch`);
-const R = require("ramda");
+const WebSocket = require('ws');
+const axios = require('axios');
+const R = require('ramda');
 
 const wsCreateServer = async ({
-  host = "localhost",
-  port = "1337",
-  endpoints,
-  stream,
-  request,
-  response,
-  stayOpen = false,
-  delay = 500,
-  onConnection = () => {},
+    host = 'localhost',
+    port = '1337',
+    endpoints,
+    stream,
+    request,
+    response,
+    stayOpen = false,
+    delay = 500,
+    onConnection = () => {},
 }) => {
-  try {
-    await new Promise((resolve) => {
-      const ti = setInterval(async () => {
-        await fetch(`http://${host}:${port}`)
-          .then(() => {})
-          .catch((err) => {
-            clearInterval(ti);
-            resolve();
-          });
-      }, 500);
-    });
-    const wss = new WebSocket.Server({ host, port });
-
-    wss.on(`connection`, (socket) => {
-      try {
-        onConnection();
-        socket.on(`message`, (message) => {
-          if (endpoints) {
-            endpoints; //?
-            let messageObject = JSON.parse(message);
-
-            for (endpoint of endpoints) {
-              if (R.equals(messageObject, JSON.parse(endpoint.request))) {
-
-                socket.send(endpoint.response);
-                if (!stayOpen) {
-                  socket.close();
-                  wss.close();
-                }
-              }
-            }
-          }
-          if (stream) {
-            let messageObject = JSON.parse(message);
-            if (R.equals(messageObject, JSON.parse(stream.request))) {
-              if (stream.response.constructor === Array) {
-                for (let msg of stream.response) {
-                  setInterval(() => socket.send(msg),
-                      delay
-                  );
-                }
-              } else {
-                socket.send(stream.response);
-              }
-            }
-          }
-          if (message === request) {
-            socket.send(response);
-            if (!stayOpen) {
-              socket.close();
-              wss.close();
-            }
-          }
-          if (message === JSON.stringify({ type: "STOP" })) {
-            socket.close();
-            wss.close();
-          }
+    try {
+        await new Promise((resolve) => {
+            const ti = setInterval(async () => {
+                await axios(`http://${host}:${port}`)
+                    .then(() => {})
+                    .catch((err) => {
+                        clearInterval(ti);
+                        resolve();
+                    });
+            }, 500);
         });
-      } catch (error) {
-        socket.send(error);
-      }
-    });
+        const wss = new WebSocket.Server({ host, port });
 
-    wss.on(`error`, (error) => {
-      console.log(`WebSocket server error: `, error);
-    });
+        wss.on('connection', (socket) => {
+            try {
+                onConnection();
+                socket.on('message', (message) => {
+                    if (endpoints) {
+                        endpoints; //?
+                        let messageObject = JSON.parse(message);
 
-    wss.on(`close`, () => {
-      console.log(`WebSocket server: connection closed`);
-    });
+                        for (endpoint of endpoints) {
+                            if (R.equals(messageObject, JSON.parse(endpoint.request))) {
+                                socket.send(endpoint.response);
+                                if (!stayOpen) {
+                                    socket.close();
+                                    wss.close();
+                                }
+                            }
+                        }
+                    }
+                    if (stream) {
+                        let messageObject = JSON.parse(message);
+                        if (R.equals(messageObject, JSON.parse(stream.request))) {
+                            if (stream.response.constructor === Array) {
+                                for (let msg of stream.response) {
+                                    setInterval(() => socket.send(msg), delay);
+                                }
+                            } else {
+                                socket.send(stream.response);
+                            }
+                        }
+                    }
+                    if (message === request) {
+                        socket.send(response);
+                        if (!stayOpen) {
+                            socket.close();
+                            wss.close();
+                        }
+                    }
+                    if (message === JSON.stringify({ type: 'STOP' })) {
+                        socket.close();
+                        wss.close();
+                    }
+                });
+            } catch (error) {
+                socket.send(error);
+            }
+        });
 
-    return async () => await closeWsServer({ host, port });
-  } catch (error) {
-    console.error(error);
-  }
+        wss.on('error', (error) => {
+            console.log('WebSocket server error: ', error);
+        });
+
+        wss.on('close', () => {
+            console.log('WebSocket server: connection closed');
+        });
+
+        return async () => await closeWsServer({ host, port });
+    } catch (error) {
+        console.error(error);
+    }
 };
 
-async function closeWsServer({ host = "localhost", port = "1337" }) {
-  try {
-    const endpoint = `${host}:${port}`;
-    console.log(`🚀 ~ closeWsServer ~ endpoint`, endpoint);
+async function closeWsServer({ host = 'localhost', port = '1337' }) {
+    try {
+        const endpoint = `${host}:${port}`;
+        console.log('🚀 ~ closeWsServer ~ endpoint', endpoint);
 
-    await fetch(`http://${endpoint}`)
-      .then(() => {
-        wsCreateAndSendMessage(
-          JSON.stringify({ type: `STOP` }),
-          `ws://${endpoint}`
-        )
-          .then(() => {
-            ({ res, socket }) => {
-              socket.close();
-              return res;
-            };
-          })
-          .catch((error) => {
-            // console.log(`closeWsServer error`, error);
-          });
-      })
-      .catch((error) => {
-        // error;
-      });
+        await axios(`http://${endpoint}`)
+            .then(() => {
+                wsCreateAndSendMessage(JSON.stringify({ type: 'STOP' }), `ws://${endpoint}`)
+                    .then(() => {
+                        ({ res, socket }) => {
+                            socket.close();
+                            return res;
+                        };
+                    })
+                    .catch((error) => {
+                        // console.log(`closeWsServer error`, error);
+                    });
+            })
+            .catch((error) => {
+                // error;
+            });
 
-    await new Promise((resolve) => {
-      const tm = setTimeout(async () => {
-        await fetch(endpoint)
-          .then((res) => {
-            res; //?
-          })
-          .catch((error) => {
-            error;
-          });
-        clearTimeout(tm);
-        resolve();
-      }, 500);
-    });
-  } catch (error) {
-    console.error(error);
-  }
+        await new Promise((resolve) => {
+            const tm = setTimeout(async () => {
+                await axios(endpoint)
+                    .then((res) => {
+                        res; //?
+                    })
+                    .catch((error) => {
+                        error;
+                    });
+                clearTimeout(tm);
+                resolve();
+            }, 500);
+        });
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 /**
@@ -139,54 +133,50 @@ async function closeWsServer({ host = "localhost", port = "1337" }) {
  * @param {string} message - the message sent through the created `WebSocket` server
  * @returns {string} response from server
  */
-const wsCreateAndSendMessage = (
-  message,
-  host = "ws://localhost:1337",
-  timeout
-) => {
-  try {
-    return new Promise(async (resolve, reject) => {
-      const socket = new WebSocket(host);
-      const messages = [];
+const wsCreateAndSendMessage = (message, host = 'ws://localhost:1337', timeout) => {
+    try {
+        return new Promise(async (resolve, reject) => {
+            const socket = new WebSocket(host);
+            const messages = [];
 
-      socket.on(`open`, () => {
-        socket.send(message);
+            socket.on('open', () => {
+                socket.send(message);
 
-        socket.on(`message`, async (message) => {
-          if (timeout) {
-            messages.push(message);
-          } else {
-            resolve({ socket, res: message });
-          }
-        });
+                socket.on('message', async (message) => {
+                    if (timeout) {
+                        messages.push(message);
+                    } else {
+                        resolve({ socket, res: message });
+                    }
+                });
 
-        socket.on(`error`, (error) => {
-          reject({ res: error, socket });
+                socket.on('error', (error) => {
+                    reject({ res: error, socket });
+                });
+            });
+            if (timeout) {
+                await new Promise((resolvePromise) => {
+                    const tm = setTimeout(() => {
+                        clearTimeout(tm);
+                        resolve({ socket, res: messages });
+                        resolvePromise();
+                    }, timeout);
+                });
+            }
         });
-      });
-      if (timeout) {
-        await new Promise((resolvePromise) => {
-          const tm = setTimeout(() => {
-            clearTimeout(tm);
-            resolve({ socket, res: messages });
-            resolvePromise();
-          }, timeout);
-        });
-      }
-    });
-  } catch (error) {
-    console.error(error);
-  }
+    } catch (error) {
+        console.error(error);
+    }
 };
 
 async function waitForResponse(cb, timeout = 200) {
-  return await new Promise((resolve) => {
-    const tm = setTimeout(async () => {
-      cb();
-      clearTimeout(tm);
-      resolve();
-    }, timeout);
-  });
+    return await new Promise((resolve) => {
+        const tm = setTimeout(async () => {
+            cb();
+            clearTimeout(tm);
+            resolve();
+        }, timeout);
+    });
 }
 
 // console.log(
@@ -209,8 +199,8 @@ async function waitForResponse(cb, timeout = 200) {
 // );
 
 module.exports = {
-  waitForResponse,
-  closeWsServer,
-  wsCreateServer,
-  wsCreateAndSendMessage,
+    waitForResponse,
+    closeWsServer,
+    wsCreateServer,
+    wsCreateAndSendMessage,
 };

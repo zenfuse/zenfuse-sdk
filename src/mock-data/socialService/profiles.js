@@ -17,7 +17,9 @@ const controllers = {
     http: {
         index: {
             get: {
-                response: { data: [{ ...model }] },
+                base: {
+                    response: { data: [{ ...model }] },
+                },
             },
             post: {
                 request: {
@@ -70,7 +72,7 @@ const controllers = {
     },
 };
 
-module.exports = { controllers };
+module.exports = { model, controllers };
 
 controllers.http.id.follow.post; //?
 // console.log(controllers.http.id.follow.post.response);

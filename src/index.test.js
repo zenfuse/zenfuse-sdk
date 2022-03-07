@@ -6,6 +6,7 @@
 const { ZenfuseApi } = require('./');
 const mockData = require('./mock-data');
 const nock = require('nock');
+const tdd = require('./tdd');
 
 const backendGetTickers = mockData.backend.ticker.tickers.tickers;
 const backendGetUsers = mockData.backend.user.users.controllers.http.index.get.response; //?
@@ -106,15 +107,40 @@ describe('Zenfuse', () => {
     describe('Social Service', () => {
         describe('getProfiles', () => {
             it.only('должен возвращать массив пользователей', async () => {
+                mockData.socialService.profiles.controllers.http.index.get.response; //?
+
+                const mockUserModel = mockData.socialService.profiles.model; //?
+
+                const expectation = {
+                    data: [
+                        {
+                            id: mockUserModel.id,
+                            username: mockUserModel.username,
+                            name: mockUserModel.name,
+                            bio: mockUserModel.bio,
+                            backendId: mockUserModel.backend_id,
+                        },
+                    ],
+                    meta: {},
+                }; //?
+
                 const zenfuse = new ZenfuseApi();
                 mockData.socialService.profiles.controllers.http.index.get.response; //?
 
                 nock(zenfuse.socialService.url)
                     .persist()
                     .get('/api/profiles')
-                    .reply(200, mockData.socialService.profiles.controllers.http.index.get.response);
+                    .query((q) => {
+                        q; //?
+                        return true;
+                    })
+                    .reply(200, mockData.socialService.profiles.controllers.http.index.get.base.response);
 
-                const profiles = await zenfuse.socialService.getProfiles(); //?
+                const profiles = await zenfuse.socialService.getProfiles({
+                    query: { populate: { posts: true, post_tickers: { ticker: true } } },
+                }); //?
+
+                expect(tdd.utils.assertTypes(profiles, expectation)).toEqual(true);
             });
         });
         describe('getPosts', () => {

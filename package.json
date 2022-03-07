@@ -34,9 +34,11 @@
         "prettier": "^2.5.1"
     },
     "dependencies": {
+        "@bit/flake.flake-ui.src.functions.utils.string-case-utils": "^1.0.9",
         "axios": "^0.25.0",
         "qs": "^6.10.3",
-        "ramda": "^0.28.0"
+        "ramda": "^0.28.0",
+        "ws": "^8.5.0"
     },
     "wallaby": {
         "maxConsoleMessagesPerTest": 100000

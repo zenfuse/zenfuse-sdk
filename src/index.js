@@ -1,4 +1,6 @@
 const axios = require('axios');
+const { prepareEntityForGet } = require('./utils/adapters');
+const qs = require('qs');
 
 const maxRequestEntitesAmount = 100;
 const servicesApiKey = process.env.SERVICES_API_KEY;
@@ -156,8 +158,20 @@ function SocialService() {
     this.url = process.env.SOCIAL_SERVICE_URL || 'http://localhost:1342';
 
     this.getProfiles = async (params) => {
+        let query;
+        if (params?.query) {
+            query = qs.stringify(
+                { ...prepareQuery(params.query) },
+                {
+                    encodeValuesOnly: true,
+                }
+            ); //?
+        }
+
+        query; //?
+
         const profiles = await axios({
-            url: `${this.url}/api/profiles`,
+            url: `${this.url}/api/profiles?${query ? query : ''}`,
         })
             .then((res) => res.data)
             .catch((error) => {
@@ -165,7 +179,10 @@ function SocialService() {
                 console.error(error);
             });
 
-        return profiles;
+        profiles; //?
+        const preparedUsers = profiles.data.map((u) => prepareEntityForGet(u)); //?
+
+        return { data: preparedUsers, meta: {} };
     };
 
     this.getPosts = async (params) => {
@@ -190,3 +207,28 @@ function ZenfuseApi() {
 }
 
 module.exports = { ZenfuseApi };
+
+function prepareQuery(query, type = '') {
+    query; //?
+    const queryObject = {};
+
+    for (const key of Object.keys(query)) {
+        key; //?
+        if (typeof query[key] === 'object') {
+            query[key]; //?
+
+            query[key] = prepareQuery(
+                query[key],
+                key === 'populate' ? 'populate' : type === 'populate' ? 'populate' : ''
+            );
+        }
+
+        if (type === 'populate' && query[key] === true) {
+            queryObject[key] = '*'; //?
+        } else {
+            queryObject[key] = query[key];
+        }
+    }
+
+    return queryObject; //?
+}
