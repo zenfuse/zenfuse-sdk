@@ -73,6 +73,7 @@ class DashboardBackend extends StrapiAdapter {
     constructor() {
         super();
         this.url = process.env.DASHBOARD_BACKEND_URL || 'http://localhost:1337'; //?
+        this.cache = {};
     }
 
     async getTickers() {
@@ -80,7 +81,7 @@ class DashboardBackend extends StrapiAdapter {
             countUrl: `${this.url}/tickers/count`,
             reuqestUrl: `${this.url}/tickers`,
         }); //?
-
+        
         return tickers;
     }
 

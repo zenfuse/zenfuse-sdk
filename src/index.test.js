@@ -43,6 +43,7 @@ describe('Zenfuse', () => {
                     .reply(200, backendGetTickers);
 
                 const tickers = await zenfuse.backend.getTickers(); //?
+
                 apiCalls; //?
                 expect(Array.isArray(tickers)).toEqual(true);
                 expect(tickers.length >= backendGetTickers.length * 10).toEqual(true);
@@ -139,7 +140,7 @@ describe('Zenfuse', () => {
                     })
                     .reply(200, mockData.socialService.profiles.controllers.http.index.get.base.response);
 
-                const profiles = await zenfuse.socialService.getProfiles(); //?
+                const profiles = await zenfuse.socialService.getProfiles({}); //?
 
                 expect(tdd.utils.assertTypes(profiles, expectation)).toEqual(true);
             });
@@ -152,7 +153,11 @@ describe('Zenfuse', () => {
 
                 nock(zenfuse.socialService.url).persist().get('/api/posts').reply(200, mockData);
 
-                const posts = await zenfuse.socialService.getPosts();
+                const params = {
+                    populate: true
+                }
+
+                const posts = await zenfuse.socialService.getPosts(params);
 
                 posts; //?
             });
