@@ -9,12 +9,36 @@ class StrapiAdapter {
     constructor() {}
 
     /**
+     *
+     * @param reuqestUrl
+     * @param strapiVersion
+     * @returns {Promise<unknown>}
+     */
+    async request({ reuqestUrl, strapiVersion = 3 }) {
+        const modelData = [];
+        return await axios({
+            url: reuqestUrl,
+        })
+            .then((res) => {
+                res; //?
+
+                return res.data;
+            })
+            .catch((error) => {
+                error; //?
+                error.message; //?
+                console.error(error);
+            });
+    }
+
+    /**
      * Функция для порционного запроса определенного ендпоинта в
      * зависимости от количества существующих экземпляров
      *
-     * @param {string} countUrl - URL на метод count модели (https://api.zenfuse/tickers/count)
-     * @param {string} reuqestUrl - URL на метод запроса данных с query (https://api.zenfuse/tickers)
-     * @returns {array}
+     * @param countUrl
+     * @param reuqestUrl
+     * @param strapiVersion
+     * @returns {Promise<*[]>}
      */
     async batchRequests({ countUrl, reuqestUrl, strapiVersion = 3 }) {
         const modelData = [];
@@ -43,8 +67,8 @@ class StrapiAdapter {
             const requestQuery =
                 strapiVersion === 3
                     ? `${
-                          reuqestUrl.indexOf('?') > -1 ? '&' : '?'
-                      }_start=${start}&_limit=${maxRequestEntitesAmount}`
+                        reuqestUrl.indexOf('?') > -1 ? '&' : '?'
+                    }_start=${start}&_limit=${maxRequestEntitesAmount}`
                     : '';
 
             const requestData = await axios({
@@ -69,6 +93,7 @@ class StrapiAdapter {
         return modelData;
     }
 }
+
 class DashboardBackend extends StrapiAdapter {
     constructor() {
         super();
@@ -81,7 +106,7 @@ class DashboardBackend extends StrapiAdapter {
             countUrl: `${this.url}/tickers/count`,
             reuqestUrl: `${this.url}/tickers`,
         }); //?
-        
+
         return tickers;
     }
 
@@ -92,6 +117,22 @@ class DashboardBackend extends StrapiAdapter {
         }); //?
 
         return users;
+    }
+
+    async getUsersCount() {
+        const usersCount = await this.request({
+            reuqestUrl: `${this.url}/users/count?services_api_key=${servicesApiKey}`,
+        }); //?
+
+        return usersCount;
+    }
+
+    async getUsersTotalBalances({ _start, _limit }) {
+        const usersTotalBalances = await this.request({
+            reuqestUrl: `${this.url}/users/total-balances?_start=${_start}&_limit=${_limit}&services_api_key=${servicesApiKey}`,
+        }); //?
+
+        return usersTotalBalances;
     }
 }
 
